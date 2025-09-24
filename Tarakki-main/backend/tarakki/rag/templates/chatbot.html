@@ -1,0 +1,71 @@
+{% extends 'dashboard/dash-base.html' %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-lg  flex flex-col h-full mx-[100px]">
+    <div id="chat-history" class="flex-grow overflow-y-auto  rounded p-4 mb-4 h-96 max-w-[1000px]">
+        {% if user_input and bot_response %}
+            <div class="chat-message user mb-2">
+                <p class="bg-blue-100 text-blue-800 p-2 rounded-lg inline-block"><strong>You:</strong> {{ user_input }}</p>
+            </div>
+            <div class="chat-message bot mb-2">
+                <p class="bg-gray-100 text-gray-800 p-2 rounded-lg inline-block"><strong>Bot:</strong>
+                    <span class="bot-response">
+                    {{ bot_response }}
+                </span> </p>
+            </div>
+        {% endif %}
+    </div>
+
+    <form method="post" 
+        hx-post="{% url 'chat' %}" 
+        hx-target="#chat-history" 
+        hx-swap="beforeend" 
+        class="flex flex-col" 
+        hx-on:htmx:after-request="
+            document.getElementById('user_input').value = ''; 
+            renderMarkdown();  
+            document.getElementById('loader').classList.add('hidden');
+            document.getElementById('send-icon').classList.remove('hidden')
+            document.getElementById('submit-button').disabled = false;
+            "
+        hx-on:htmx:before-request = "document.getElementById('loader').classList.remove('hidden'); document.getElementById('send-icon').classList.add('hidden');"
+        hx-on:htmx:after-swap="renderMarkdown();"
+        
+        >
+        {% csrf_token %}
+        <div class="flex gap-2 items-center">
+            <input type="text" id="user_input" placeholder="Ask your query" name="user_input" class="border rounded p-4 rounded-full w-full" required>
+            <button id="submit-button" class="btn btn-circle bg-gradient-to-r from-gray-900 via-gray-600 to-purple-600/60 w-[80px] h-full text-white">
+                <svg id="send-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                  </svg>
+                  <span class="loading loading-dots loading-sm hidden" id="loader"></span>
+              </button>
+            
+            
+
+        </div>
+            
+    </form>
+</div>
+
+<script>
+    function clearInput() {
+      document.getElementById('user_input').value = '';
+    }
+    function renderMarkdown() {
+        // Function to parse and render bot's markdown response
+        const botResponseElement =  document.querySelectorAll('.bot-response');
+        // Check if there are any elements and get the last one
+        console.log(botResponseElement)
+        if (botResponseElement.length > 0) {
+            
+            console.log("called")
+        const lastElement= botResponseElement[botResponseElement.length - 1];
+        console.log(lastElement.textContent);  // Output: "Message 4"
+        lastElement.innerHTML = marked.parse(lastElement.textContent);
+    }
+    }
+
+  </script>
+{% endblock %}

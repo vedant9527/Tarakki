@@ -1,0 +1,281 @@
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f4f4f4, #e0e0e0);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 900px;
+    text-align: center;
+    overflow-y: auto;
+    border: 1px solid #ddd; /* Added border for subtle separation */
+    background: #f9f9f9; /* Light background for better readability */
+}
+
+/* Timer Container */
+#timer-container {
+    position: fixed; /* Make the timer fixed on the screen */
+    top: 20px; /* Position from the top of the screen */
+    right: 20px; /* Position from the right of the screen */
+    background-color: #ffffff; /* Ensure a solid background for readability */
+    padding: 15px; /* Padding for spacing */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+#timer-container h2 {
+    font-size: 20px;
+    color: #333;
+    font-weight: 600;
+}
+
+#timer {
+    color: #e74c3c; /* Red color for the timer */
+    font-weight: 700;
+}
+
+
+/* Header Styles */
+h1 {
+    color: #333;
+    font-size: 2em; /* Larger font size for prominence */
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+h2, h3 {
+    color: #555;
+    font-weight: 600;
+}
+
+/* Question Container */
+#questions-container {
+    margin-bottom: 30px; /* Increased margin for better spacing */
+}
+
+/* Individual Question Styles */
+.question {
+    margin-bottom: 25px;
+    text-align: left;
+    border-bottom: 1px solid #ddd; /* Added border for better separation */
+    padding-bottom: 15px; /* Padding for spacing */
+}
+
+.question h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #444;
+    font-weight: 600;
+}
+
+.question p {
+    margin-bottom: 10px;
+    color: #666;
+    font-size: 16px; /* Slightly larger font size */
+}
+
+/* Options List */
+.options {
+    list-style-type: none;
+    padding: 0;
+}
+
+.options li {
+    margin-bottom: 12px; /* Added more space for better separation */
+    padding: 10px;
+    background-color: #f1f1f1; /* Light background for options */
+    border-radius: 5px; /* Rounded corners for options */
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.options li:hover {
+    background-color: #e0e0e0; /* Highlight on hover */
+}
+
+.options input[type="radio"] {
+    margin-right: 12px;
+}
+
+.options label {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    cursor: pointer; /* Ensure cursor is a pointer to indicate clickable area */
+}
+
+/* Button Container */
+.button-container {
+    margin-top: 30px;
+}
+
+/* Button Styles */
+button {
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    padding: 15px 25px; /* Larger padding for better click area */
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:disabled {
+    background: #999;
+    cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+    background: linear-gradient(90deg, #0056b3, #004494);
+    transform: translateY(-2px); /* Slight lift on hover */
+}
+
+/* Result Container */
+#result-container {
+    text-align: center;
+}
+
+#result-container h3 {
+    font-size: 24px;
+    color: #333;
+    font-weight: 700;
+}
+
+/* Scores Container */
+#scores-container ul {
+    padding: 0;
+    list-style: none;
+}
+
+#scores-container li {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    /* color: #fff; */
+    color: black;
+    font-weight: 600;
+    text-align: left;
+    font-size: 18px;
+}
+
+#qualities-pie-chart {
+    width: 100px;  /* Set desired width */
+    height: 100px; /* Set desired height */
+    max-width: 100%; /* Ensure it’s responsive */
+}
+
+/* #scores-container li:nth-child(1) { background-color: #ff6384; }
+#scores-container li:nth-child(2) { background-color: #36a2eb; }
+#scores-container li:nth-child(3) { background-color: #cc65fe; }
+#scores-container li:nth-child(4) { background-color: #ffce56; }
+#scores-container li:nth-child(5) { background-color: #f55c47; }
+#scores-container li:nth-child(6) { background-color: #4bc0c0; }
+#scores-container li:nth-child(7) { background-color: #9966ff; }
+#scores-container li:nth-child(8) { background-color: #ff9f40; }
+#scores-container li:nth-child(9) { background-color: #ffcc33; }
+#scores-container li:nth-child(10) { background-color: #33cc33; } */
+/* #scores-container li:nth-child(1) { background-color: #e57373; } 
+#scores-container li:nth-child(2) { background-color: #64b5f6; } 
+#scores-container li:nth-child(3) { background-color: #ba68c8; } 
+#scores-container li:nth-child(4) { background-color: #ffb74d; } 
+#scores-container li:nth-child(5) { background-color: #ef5350; } 
+#scores-container li:nth-child(6) { background-color: #4db6ac; } 
+#scores-container li:nth-child(7) { background-color: #9575cd; } 
+#scores-container li:nth-child(8) { background-color: #ff8a65; } 
+#scores-container li:nth-child(9) { background-color: #ffd54f; } 
+#scores-container li:nth-child(10) { background-color: #81c784; }  */
+
+/* Chart Container */
+#chart-container {
+    margin-top: 30px;
+}
+
+/* Parameter Descriptions */
+#parameter-descriptions {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+
+#parameter-descriptions p {
+    color: #777;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+/* Footer Styles */
+footer {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-top: 1px solid #ddd;
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+}
+
+footer a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Circle before each parameter name */
+#scores-container li::before {
+    content: '●'; /* Circle symbol */
+    display: inline-block;
+    margin-right: 10px;
+}
+
+/* Chart Animations */
+#chart-container canvas {
+    transition: transform 0.5s ease-in-out;
+    transform-origin: bottom;
+}
+
+/* Hover Animation */
+#chart-container canvas:hover {
+    transform: scale(1.05);
+}
+
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        width: 100%;
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    #scores-container li {
+        font-size: 16px;
+    }
+
+    button {
+        width: 100%;
+        padding: 15px;
+        font-size: 16px;
+    }
+}
+

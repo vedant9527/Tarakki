@@ -1,0 +1,40 @@
+<nav class="px-8 py-2 bg-transparent relative z-50">
+  <div class="container mx-auto flex justify-between items-center h-24 text-[#171717d2]">
+    <div class="font-bold flex gap-6 items-center text-[18px]">
+      <div class="max-w-[80px]"></div>
+      <div>
+        <a  
+           class="hover:text-slate-800">
+          Home
+        </a>
+      </div>
+      <div>
+        <a href="#" class="hover:text-slate-800">
+          Predict
+        </a>
+      </div>
+      <div>
+        <a href="#" class="hover:text-slate-800">
+          Resource Portal
+        </a>
+      </div>
+      <div>
+        <a href="#" class="hover:text-slate-800">
+          Mentor Portal
+        </a>
+      </div>
+    </div>
+    
+    <div class="flex space-x-6 items-center">
+      <!-- <input type="text" placeholder="Type here" class="input input-bordered max-w-xs rounded-full" /> -->
+      
+      <a href="{% url 'signup' %}">
+        <button class="btn btn-neutral rounded-full px-8 py-2">Sign up</button>
+      </a>
+      
+      <a href="{% url 'signin' %}">
+        <button class="btn rounded-full px-8 py-2">Sign In</button>
+      </a>
+    </div>
+  </div>
+</nav>

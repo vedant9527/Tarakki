@@ -1,0 +1,86 @@
+{% extends 'dashboard/dash-base.html' %} {% load static %} {% block content %}
+<div class="p-10 max-w-[1300px]">
+  <div class="text-2xl font-semibold mb-4">Interest Assessment</div>
+  <div class="text-gray-600 font-semibold">
+    We have assessed your aptitude and scored you on your performance. Now its
+    time from you to tell us about your interests. This will help us to suggest
+    you the best career options. Please answer the below questions and tell us
+    about your interests.
+  </div>
+  <div class="flex items-center justify-center">
+    <ul class="steps mt-10">
+      <li class="step step-neutral">Aptitude Assessment</li>
+      <li class="step step-neutral">Interests Analysis</li>
+      <li class="step">Get Prediction</li>
+      <li class="step">Roadmaps Generation</li>
+    </ul>
+  </div>
+  <form 
+  method="post"
+  class="mt-14 px-[100px] flex flex-col gap-8"
+  hx-post="{% url 'interest' %}"
+  id="careerForm"
+  >
+  {% csrf_token %}
+    <div class="flex gap-2 flex-col">
+      <div class="text-gray-600">
+        1. Tell us Something about the career that has interested you the most?
+      </div>
+      <textarea
+        class="textarea textarea-ghost border-1 border-gray-300 w-full"
+        placeholder="career"
+      ></textarea>
+    </div>
+    <div class="flex flex-col gap-2">
+        <div class="text-gray-600">2. Do you already have a career in mind?</div>
+        <div class="flex gap-4">
+            <!-- Radio button for "Yes" -->
+            <label class="inline-flex items-center">
+              <input type="radio" name="career" class="radio" checked="checked" value="yes" />
+              <span class="ml-2">Yes</span>
+            </label>
+            
+            <!-- Radio button for "No" -->
+            <label class="inline-flex items-center ml-4">
+              <input type="radio" name="career" class="radio" value="no" />
+              <span class="ml-2">No</span>
+            </label>
+            <input type="text" placeholder="if yes, Specify" class="input input-bordered w-full max-w-xs" />
+        </div>
+    </div>
+    <div class="flex gap-2 flex-col">
+        <div class="text-gray-600">
+          3. What do you like to do in your free time? (Hobbies, Interests)
+        </div>
+        <textarea
+          class="textarea textarea-ghost border-1 border-gray-300 w-full"
+          placeholder="Hobbies, Interests"
+        ></textarea>
+      </div>
+      <div class="flex justify-start">
+        <button class="btn btn-neutral w-[150px]">Submit</button>
+    </div>
+  </form>
+</div>
+<script>
+    // HTMX event listener to handle form data before making the request
+    // function handleFormSubmit(event) {
+    //     event.preventDefault(); // Prevent the default request behavior
+
+    //     // Get form data
+    //     const form = document.getElementById('careerForm');
+    //     const formData = new FormData(form);
+
+    //     const careerInterest = formData.get('career_interest');
+    //     const careerMind = formData.get('career');
+    //     const careerSpecify = formData.get('career_specify');
+    //     const hobbies = formData.get('hobbies');
+
+    //     // Log the data to the console
+    //     console.log('Career Interest:', careerInterest);
+    //     console.log('Career in Mind:', careerMind);
+    //     console.log('Career Specify:', careerSpecify);
+    //     console.log('Hobbies:', hobbies);
+    // }
+</script>
+{% endblock %}

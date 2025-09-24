@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarakki</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp,container-queries"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+</head>
+<style>
+  .background-section {
+      background-image: url("{% static '/background.jpg' %}");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100vh; /* Example height, adjust as needed */
+  }
+</style>
+<body class="background-section">
+
+  {% include 'landing/navbar.html' %}
+  <div class="flex justify-center mt-20">
+      <div class="text-center">
+        <div class="text-[56px] font-bold">Tarakki</div>
+        <div class="font-semibold text-gray-800 text-[24px]">
+          Empowering Futures with AI: Tailored Guidance for Every Career Path.
+        </div>
+        <a href="{% url 'dashboard_home' %}">
+          <button class="btn btn-neutral rounded-full px-8 mt-10 text-[18px]">Get Started</button>
+        </a>
+      </div>
+    </div>
+</body>
+</html>
+
+
+
+  
+

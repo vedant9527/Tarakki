@@ -1,0 +1,508 @@
+{% extends "dashboard/dash-base.html" %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/aptitude_test.css' %}" type="text/css">
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container" id="test-container">
+    <h1 style="font-weight: bold; font-size: 2.5em;">Aptitude Test</h1>
+    <div id="instructions-container" style="margin-top: 20px; font-size: 1.1em;" class="text-left">
+        <div tabindex="0" class="collapse collapse-arrow border-base-300 bg-base-200 border">
+            <div class="collapse-title text-xl font-medium">Instructions</div>
+            <div class="collapse-content flex flex-col gap-4 px-24">
+                <p><strong>Purpose:</strong> This test evaluates various aptitude parameters to help you understand your strengths and areas of improvement.</p>
+                <p><strong>Duration:</strong> The test will take approximately 20 minutes to complete. A timer starts at the top-right. Once the time ends your test will be automatically submitted.</p>
+                <div>
+                    <p><strong>How to Navigate:</strong></p>
+
+                    <ul>
+                        <li>Click on a parameter name (e.g., "O_score") to view the related questions.</li>
+                        <li>Questions will appear under each parameter once you click on it.</li>
+                    </ul>
+                </div>
+                <div>
+
+                    <p><strong>Marking Scheme:</strong></p>
+                    <ul>
+                        <li>All parameters have 10 questions associated with it. Since there are 10 parameters there are total 100 questions.</li>
+                        <li>Each question has 1 mark. The test is of 100 marks (there is no negative marking).</li>
+                        <li>Questions under the parameter O_score, C_score, E_score, A_score, N_score are behavioural questions. There are no correct/wrong answers for such questions.</li>
+                    </ul>
+                </div>
+                <div>
+                    <p><strong>Answering Questions:</strong></p>
+                    <ul>
+                        <li>Select your answer by clicking the radio button next to your chosen option (A, B, C, or D).</li>
+                        <li>You can change your answer by just selecting on the desired option.</li>
+                    </ul>
+
+                </div>
+                <div>
+
+                    <p><strong>Completion:</strong></p>
+                    <ul>
+                        <li>Make sure to complete all questions before submission. Your answers will be saved automatically.</li>
+                    </ul>
+                    <p><strong>Results:</strong></p>
+                    <ul>
+                        <li>After completing the test, you’ll be able to view your results and detailed feedback on the results page.</li>
+                    </ul>
+                </div>
+                <div>
+
+                    <p><strong>Support:</strong></p>
+                    <ul>
+                        <li>For any issues or questions, please contact our support team or visit the help section.</li>
+                    </ul>
+                </div>
+            </div>
+          </div>
+        
+    </div>
+    <div id="timer-container" style="text-align: center !important;">
+        <h2>Time Left: <span id="timer">20:00</span></h2>
+    </div>
+    <div id="parameter"></div>
+    <div id="questions-container">
+        <!-- Questions will be dynamically inserted here -->
+    </div>
+    <div class="button-container">
+        <button id="submit-button" onclick="submitTest()" disabled>Submit Test</button>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<div class="container" id="result-container" style="display: none;">
+    <h2>Test Results</h2>
+    <h3>Scores:</h3>    
+    <div id="scores-container">
+        <!-- Scores will be dynamically inserted here -->
+    </div>
+    <div id="chart-container">
+        <canvas id="score-chart" width="400" height="200"></canvas>
+    </div>
+
+    <div id="parameter-descriptions" style="font-size: 10px;">
+        <h4>Parameter Descriptions:</h4>
+        <p><strong>O_score:</strong> Openness to experience, indicating creativity and open-mindedness.</p>
+        <p><strong>C_score:</strong> Consciousness, showing how organized and dependable a person is.</p>
+        <p><strong>E_score:</strong> Extraversion, reflecting sociability and assertiveness.</p>
+        <p><strong>A_score:</strong> Agreeableness, indicating trustworthiness and kindness.</p>
+        <p><strong>N_score:</strong> Neuroticism, showing emotional stability and resilience.</p>
+        <p><strong>Numerical Aptitude:</strong> Ability to work with numbers and logical reasoning.</p>
+        <p><strong>Spatial Aptitude:</strong> Understanding of spatial relationships and visualizing objects in space.</p>
+        <p><strong>Perceptual Aptitude:</strong> Ability to notice and understand visual details quickly and accurately.</p>
+        <p><strong>Abstract Reasoning:</strong> Ability to analyze complex problems and patterns.</p>
+        <p><strong>Verbal Reasoning:</strong> Ability to understand and reason using concepts framed in words.</p>
+    </div>
+    <h1 >Your Qualities</h1>
+    <div id="pie">
+        
+        <canvas id="qualities-pie-chart" class="chart"></canvas>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const timerDisplay = document.getElementById('timer');
+        const totalTime = 20 * 60; // Total time in seconds (20 minutes)
+        let remainingTime = totalTime;
+
+        function updateTimer() {
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+            timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            remainingTime--;
+
+            if (remainingTime < 0) {
+                clearInterval(timerInterval);
+                alert('Time is up!');
+                submitTest();  // Automatically submit the test when time is up
+            }
+        }
+
+        const timerInterval = setInterval(updateTimer, 1000);
+
+        document.getElementById('submit-button').addEventListener('click', function() {
+            clearInterval(timerInterval); // Stop the timer when the test is submitted manually
+            submitTest();
+        });
+    });
+
+    let testId;
+    let answers = [];
+    let testStarted = false;
+
+    function startTest() {
+        console.log("start test has been called")
+        if (testStarted) return; // Prevent multiple calls
+        testStarted = true;
+        fetch('{% url "start_test" %}', {
+            method: 'GET',  // Adjust if POST is needed
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+        .then(data => {
+            console.log(data)
+            testId = data.test_id;
+            console.log("Test ID:", testId); // Log testId to ensure it's correctly set
+            displayQuestions(data.questions);
+        })
+        .catch(error => console.error('Error starting test:', error));  // Added error handling
+    }
+
+    // function displayQuestions(questions) {
+    //     const questionsContainer = document.getElementById('questions-container');
+    //     questionsContainer.innerHTML = '';
+    //     let lastParameter = null;  // Track the last parameter displayed
+
+    //     questions.forEach((q, index) => {
+    //         // Check if the current parameter is different from the last one
+    //         if (q.parameter !== lastParameter) {
+    //             // Display the parameter only if it's different from the previous one
+    //             const parameterDiv = document.createElement('div');
+    //             parameterDiv.className = 'parameter-header';
+    //             parameterDiv.innerHTML = `<h3>Parameter: ${q.parameter}</h3>`;
+    //             questionsContainer.appendChild(parameterDiv);
+    //             parameterDiv.style.backgroundColor = '#f0f0f0';
+    //             parameterDiv.style.borderLeft = '5px solid #4CAF50';
+    //             parameterDiv.style.padding = '10px 20px';
+    //             parameterDiv.style.margin = '20px 0';
+    //             parameterDiv.style.fontSize = '1.2em';
+    //             parameterDiv.style.color = '#333';
+    //             parameterDiv.style.fontWeight = 'bold';
+    //             // Update the lastParameter to the current one
+    //             lastParameter = q.parameter;
+    //         }
+
+    //         // Display the question as usual
+    //         const questionDiv = document.createElement('div');
+    //         questionDiv.className = 'question';
+    //         questionDiv.innerHTML = `
+    //             <h4>Question ${index + 1}</h4>
+    //             <p>${q.question_text}</p>
+    //             <ul class="options">
+    //                 <li><label><input type="radio" name="question-${index}" value="A" onclick="saveAnswer(${index}, 'A')"> ${q.option_a}</label></li>
+    //                 <li><label><input type="radio" name="question-${index}" value="B" onclick="saveAnswer(${index}, 'B')"> ${q.option_b}</label></li>
+    //                 <li><label><input type="radio" name="question-${index}" value="C" onclick="saveAnswer(${index}, 'C')"> ${q.option_c}</label></li>
+    //                 <li><label><input type="radio" name="question-${index}" value="D" onclick="saveAnswer(${index}, 'D')"> ${q.option_d}</label></li>
+    //             </ul>
+    //         `;
+    //         questionsContainer.appendChild(questionDiv);
+    //     });
+
+
+
+
+
+
+
+
+
+            const parameterDescriptions = {
+            O_score: "Openness to experience, indicating creativity and open-mindedness.",
+            C_score: "Consciousness, showing how organized and dependable a person is.",
+            E_score: "Extraversion, reflecting sociability and assertiveness.",
+            A_score: "Agreeableness, indicating trustworthiness and kindness.",
+            N_score: "Neuroticism, showing emotional stability and resilience.",
+            Numerical_Aptitude: "Ability to work with numbers and logical reasoning.",
+            Spatial_Aptitude: "Understanding of spatial relationships and visualizing objects in space.",
+            Perceptual_Aptitude: "Ability to notice and understand visual details quickly and accurately.",
+            Abstract_Reasoning: "Ability to analyze complex problems and patterns.",
+            Verbal_Reasoning: "Ability to understand and reason using concepts framed in words."
+        };
+
+        function displayQuestions(questions) {
+        const questionsContainer = document.getElementById('questions-container'); // Ensure this is the correct ID
+        let globalQuestionNumber = 1; // Initialize global question number
+
+        let questionsByParameter = {}; // To group questions by parameter
+
+        // Group questions by their parameter
+        // questions.forEach((q,index) => {
+        questions.forEach((q) => {
+            const parameter = q.parameter.trim(); // Remove leading/trailing whitespace
+            
+            if (!questionsByParameter[parameter]) {
+                questionsByParameter[parameter] = [];
+            }
+            questionsByParameter[parameter].push(q); // Push questions to the respective parameter
+        });
+
+        // Log the grouped questions to verify
+        console.log('Questions grouped by parameter:', questionsByParameter);
+
+        // Now iterate over the grouped questions by parameter
+        Object.keys(questionsByParameter).forEach((parameter) => {
+            // Create and append the new parameter header
+            const description = parameterDescriptions[parameter] || ''; // Get description from the map
+            const parameterHeader = document.createElement('h2');
+            parameterHeader.className = 'parameter-header';
+            parameterHeader.style.backgroundColor = '#f0f0f0';
+            parameterHeader.style.borderLeft = '5px solid #4CAF50';
+            parameterHeader.style.padding = '10px 20px';
+            parameterHeader.style.margin = '20px 0';
+            parameterHeader.style.fontSize = '1.2em';
+            parameterHeader.style.color = '#333';
+            parameterHeader.style.fontWeight = 'bold';
+            parameterHeader.style.cursor = 'pointer'; // Ensure it's clickable
+            // parameterHeader.textContent = parameter;
+            parameterHeader.innerHTML = `${parameter} <span style="font-size: 0.9em; color: #777; font-weight: normal;">(${description})</span>`;
+            questionsContainer.appendChild(parameterHeader);
+
+            // Create a div to hold the questions for this parameter
+            const currentQuestionsDiv = document.createElement('div');
+            currentQuestionsDiv.className = 'questions-container';
+            currentQuestionsDiv.style.display = 'none'; // Hide by default
+            questionsContainer.appendChild(currentQuestionsDiv);
+
+            // Add an event listener to the parameter header to toggle questions
+            parameterHeader.addEventListener('click', () => {
+                if (currentQuestionsDiv.style.display === 'none') {
+                    currentQuestionsDiv.style.display = 'block';
+                } else {
+                    currentQuestionsDiv.style.display = 'none';
+                }
+            });
+            
+            // Iterate over the questions for the current parameter
+            questionsByParameter[parameter].forEach((q, index) => {
+                // Use index + 1 for question numbering per parameter
+                const questionNumber = globalQuestionNumber++;
+
+                // Create and append the question div
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.innerHTML = `
+                    <h3>Question ${questionNumber}</h3>
+                    <p>${q.question_text}</p>
+                    <ul class="options">
+                        <li><label><input type="radio" name="question-${questionNumber}" value="A" onclick="saveAnswer(${questionNumber}, 'A')"> ${q.option_a}</label></li>
+                        <li><label><input type="radio" name="question-${questionNumber}" value="B" onclick="saveAnswer(${questionNumber}, 'B')"> ${q.option_b}</label></li>
+                        <li><label><input type="radio" name="question-${questionNumber}" value="C" onclick="saveAnswer(${questionNumber}, 'C')"> ${q.option_c}</label></li>
+                        <li><label><input type="radio" name="question-${questionNumber}" value="D" onclick="saveAnswer(${questionNumber}, 'D')"> ${q.option_d}</label></li>
+                    </ul>
+                `;
+
+                // Append the question to the current questions div
+                currentQuestionsDiv.appendChild(questionDiv);
+            });
+        });
+
+
+
+
+        document.getElementById('submit-button').disabled = false; // Enable submit button once questions are displayed
+    }
+
+    function saveAnswer(questionIndex, answer) {
+        answers[questionIndex] = answer;
+    }
+    // let formData = new FormData();
+    // formData.append('test_id', testId);
+    // formData.append('answers', JSON.stringify(answers));
+    function submitTest() {
+        console.log("Submitting test with testId:", testId); // Log testId to check if it's undefined
+
+    if (!testId) {
+        console.error("testId is not defined. Cannot submit test.");
+        return;
+    }
+        fetch('{% url "submit_test" %}', {
+            method: 'POST',
+            // body: formData,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                test_id: testId,
+                answers: answers
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Server response:", data); // Debugging line
+            //console.log("Type of data.score:", typeof data.score);
+            if (data) {
+                document.getElementById('test-container').style.display = 'none';
+                document.getElementById('result-container').style.display = 'block';
+                //const scoresContainer = document.getElementById('scores-container');
+                //scoresContainer.innerHTML = `<p>Total Score: ${data.score}</p>`;
+            } else {
+                console.error('Unexpected server response:', data);
+            }
+    function darkenColor(color, percent = 20) {
+    const num = parseInt(color.slice(1), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) - amt;
+    const G = ((num >> 8) & 0x00FF) - amt;
+    const B = (num & 0x0000FF) - amt;
+
+    return `#${(0x1000000 + (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 + 
+        (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 + 
+        (B < 255 ? (B < 1 ? 0 : B) : 255)).toString(16).slice(1).toUpperCase()}`;
+}
+
+        const scoresContainer = document.getElementById('scores-container');
+
+            // Define colors for each score parameter
+            const colors = [
+                '#e57373', '#64b5f6', '#ba68c8', '#ffb74d', '#ef5350',
+                '#4db6ac', '#9575cd', '#ff8a65', '#ffd54f', '#81c784'
+            ];
+
+            // Start building the table
+            let scoresHtml = '<table style="width: 100%; border-collapse: collapse;">';
+            scoresHtml += '<tr>'; // Start the first row
+
+            Object.entries(data.scores).forEach(([parameter, score], index) => {
+                if (index % 3 === 0 && index !== 0) {
+                    scoresHtml += '</tr><tr>'; // End the current row and start a new one
+                }
+
+                // Add a table cell for each score
+                scoresHtml += `
+                    <td style="padding: 10px; border: 1px solid #ddd;">
+                        <span style="display: inline-block; width: 12px; height: 12px; background-color: ${colors[index]}; border-radius: 50%; margin-right: 10px;"></span>
+                        ${parameter}: ${score}/10
+                    </td>`;
+            });
+
+            // Add the total marks to the last row
+            const totalMarks = Object.values(data.scores).reduce((a, b) => a + b, 0);
+            scoresHtml += `<tr><td colspan="3" style="padding: 10px; border: 1px solid #ddd; text-align: center;">Total Marks: ${totalMarks}/100</td></tr>`;
+
+            // Close the table
+            scoresHtml += '</table>';
+
+            // Insert the generated HTML into the container
+            scoresContainer.innerHTML = scoresHtml;
+
+
+            // Custom Chart.js Configuration
+            const chartConfig = {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data.scores),
+                    datasets: [{
+                        label: 'Your Scores',
+                        data: Object.values(data.scores),
+                        backgroundColor: colors,
+                        borderColor: colors.map(color => darkenColor(color)),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeInOutBounce'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            };
+
+            // Create the bar chart
+            const ctx = document.getElementById('score-chart').getContext('2d');
+            new Chart(ctx, chartConfig);
+
+            // Pie chart
+            const qualities = data.qualities;
+            const qualityCounts = qualities.reduce((acc, quality) => {
+                acc[quality] = (acc[quality] || 0) + 1;
+                return acc;
+            }, {});
+
+            const labels = Object.keys(qualityCounts);
+            const dataPoints = labels.map(label => qualityCounts[label]);
+
+            const ctx1 = document.getElementById('qualities-pie-chart').getContext('2d');
+            ctx1.width=400;
+            ctx1.height = 400;
+            new Chart(ctx1, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Qualities',
+                        data: dataPoints,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)',
+                            'rgba(199, 199, 199, 0.2)',
+                            'rgba(83, 102, 255, 0.2)',
+                            'rgba(255, 99, 255, 0.2)',
+                            'rgba(255, 205, 86, 0.2)',
+                            'rgba(155, 162, 135, 0.2)',
+                            'rgba(231, 102, 255, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(199, 199, 199, 1)',
+                            'rgba(83, 102, 255, 1)',
+                            'rgba(255, 99, 255, 1)',
+                            'rgba(255, 205, 86, 1)',
+                            'rgba(155, 162, 135, 1)',
+                            'rgba(231, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        datalabels: {
+                            formatter: (value, ctx) => {
+                                let sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                let percentage = (value / sum * 100).toFixed(2) + "%";
+                                return percentage;
+                            },
+                            color: '#fff',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    };
+
+    // Start the test when the page loads
+    window.onload = function(){
+        startTest();
+    }
+</script>
+{% endblock %}

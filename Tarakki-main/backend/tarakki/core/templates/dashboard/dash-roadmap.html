@@ -1,0 +1,61 @@
+{% extends 'dashboard/dash-base.html' %} {% block content %}
+<div
+  class="p-6 px-8 rounded-lg bg-gradient-to-b from-gray-200/20 via-gray-300 to-[#64748b]/20"
+>
+  <h1 class="font-bold text-[30px]">RoadMap</h1>
+  <div class="font-semibold text-gray-600 mt-100">Detailed RoadMap for a {{request.GET.career}}</div>
+  <div class="relative max-w-[1200px] mx-auto after:content-[''] after:w-[6px] after:h-[100%]  after:top-0 after:left-[50%] after:bg-white after:absolute after:mx-3">
+    {% for item in items %}
+    <div class="flex px-[10px] py-[20px] w-full {% if forloop.counter|divisibleby:2 %}flex-row-reverse ml-8{% else %}flex-row{% endif %}">
+      <div class="w-[50%]  px-[40px] py-[30px] rounded-lg bg-white text-[15px] relative flex flex-col gap-4 bg-gray-200 backdrop-blur-xl shadow-lg border border-white/30">
+        <h2 class="font-bold text-[20px]">{{ item.title }}</h2>
+        <p>{{ item.description }}</p>
+        <button class="btn btn-sm self-start" onclick="document.getElementById('modal_{{ forloop.counter }}').showModal()">More Details</button>
+      </div>
+      <dialog id="modal_{{ forloop.counter }}" class="modal">
+        <div class="modal-box w-[800px] max-w-5xl">
+          <h3 class="text-xl font-bold">{{item.title}}</h3>
+          <div class="flex flex-col gap-4 mt-4">
+            {% for subitem in item.steps%}
+            <div>
+              <p class="font-semibold">{{subitem.title}}</p>
+              <p>{{subitem.description}}</p>
+
+            </div>
+            {% endfor %}
+
+          </div>
+          <div class="modal-action">
+            <form method="dialog">
+              <!-- if there is a button, it will close the modal -->
+              <button class="btn">Close</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+    </div>
+    {% endfor %}
+  </div>
+   <!-- Chatbox and Button -->
+   <div id="chatbox" class="fixed bottom-20 right-8 hidden w-[300px] bg-white shadow-lg rounded-lg p-4">
+    <h3 class="font-bold text-lg">Chat with us</h3>
+    <div class="chat-content overflow-y-auto max-h-[300px] mt-2">
+      <p>Any question related to the RoadMap?</p>
+    </div>
+    <input type="text" class="mt-2 w-full p-2 border border-gray-300 rounded-md" placeholder="Type your message...">
+  </div>
+
+  <button id="chat-button" class="fixed bottom-8 right-8 w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-600 ">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16h6M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  </button>
+
+  <script>
+    document.getElementById('chat-button').addEventListener('click', function () {
+      var chatbox = document.getElementById('chatbox');
+      chatbox.classList.toggle('hidden');
+    });
+  </script>
+</div>
+{% endblock %}

@@ -85,5 +85,4 @@ Open `http://127.0.0.1:5000/`.
 - The test question bank lives in `backend/tarakki/core/your_data_2.csv` (and a copy under `AptitudeTest/`).
 - Gemini requires `GEMINI_API_KEY` to be set in the environment.
 
-## License
-Add a license if you plan to distribute this project.
+
